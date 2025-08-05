@@ -1,0 +1,20 @@
+{
+  "name": "lexicalgem",
+  "version": "2.0.0",
+  "description": "A professional and educational Telegram bot that sends unusual, elegant, or fun words along with their definitions. Learn a word you didn't know you needed.",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "dotenv": "^16.6.1",
+    "node-telegram-bot-api": "^0.66.0",
+    "chalk": "^4.1.2"
+  }
+}
