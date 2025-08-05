@@ -94,7 +94,7 @@ Start chatting with the bot to discover rare and elegant words!
 5. **Configure the .env file**
    ```bash
    # Open .env file and replace with your actual token
-   BOT_TOKEN_CODE=1234567890:ABCdefGHIjklMNOpqrsTUVwxyz
+   BOT_TOKEN_CODE=YOUR-TOKEN
    ```
 
 6. **Run the bot**
