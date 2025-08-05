@@ -258,7 +258,7 @@ Feel free to contribute by:
 
 ## 📄 License
 
-ISC License
+MIT License
 
 ---
 
