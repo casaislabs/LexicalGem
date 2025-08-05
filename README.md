@@ -57,6 +57,12 @@ src/
 - A Telegram bot token (get it from [@BotFather](https://t.me/botfather))
 - dotenv package (will be installed automatically)
 
+### 🎯 **Try the Bot Live!**
+
+**Experience LexicalGem in action:** [@LexicGemBot](https://t.me/LexicGemBot)
+
+Start chatting with the bot to discover rare and elegant words!
+
 ### Installation
 
 1. **Clone or download this repository**
@@ -157,6 +163,12 @@ The bot uses environment variables for secure configuration:
 ## 🎯 Purpose
 
 Showcasing how a simple but well-executed bot can deliver educational value and a charming user experience with minimal setup. Perfect for portfolios demonstrating bot development with Node.js and Telegram API.
+
+### 🌟 **Live Demo**
+
+**Try the bot now:** [@LexicGemBot](https://t.me/LexicGemBot)
+
+Experience the full functionality with all 9 commands available!
 
 ## 🔧 Customization
 
