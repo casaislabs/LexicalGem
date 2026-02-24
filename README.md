@@ -59,7 +59,7 @@ src/
 
 ### 🎯 **Try the Bot Live!**
 
-**Experience LexicalGem in action:** [@LexicGemBot](https://t.me/LexicGemBot)
+**Experience LexicalGem in action:** [@LexicGemBot](https://t.me/LexicGem_Bot)
 
 Start chatting with the bot to discover rare and elegant words!
 
