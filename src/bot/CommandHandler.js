@@ -41,7 +41,8 @@ class CommandHandler {
         
         // Register with Telegram bot - escape special characters in regex
         const escapedCommand = command.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        this.bot.onText(new RegExp(`^${escapedCommand}$`), async (msg) => {
+        const commandPattern = new RegExp(`^${escapedCommand}(?:@[A-Za-z0-9_]+)?(?:\\s+.+)?$`);
+        this.bot.onText(commandPattern, async (msg) => {
             try {
                 await this.executeCommand(command, msg);
             } catch (error) {
@@ -130,7 +131,9 @@ class CommandHandler {
             return;
         }
 
-        const randomWord = this.wordService.getRandomWord();
+        const userPreferences = this.userService.getUserStats(from.id);
+        const preferredDifficulty = userPreferences?.difficulty || 'medium';
+        const randomWord = this.wordService.getRandomWord(preferredDifficulty);
         
         if (!randomWord) {
             Logger.error('Failed to get random word', { userId: from.id });
@@ -156,6 +159,8 @@ class CommandHandler {
         Logger.bot('Word command executed', {
             userId: from.id,
             word: randomWord.word,
+            preferredDifficulty,
+            selectedDifficulty: randomWord.difficulty,
             progress: `${stats.usedWords}/${stats.totalWords}`
         });
 
@@ -299,7 +304,7 @@ ${wordOfTheDay.emoji} *${wordOfTheDay.word}* — ${wordOfTheDay.definition}
             return;
         }
 
-        let historyMessage = `${Constants.MESSAGES.HISTORY}\n\n`;
+        let historyMessage = `${Constants.MESSAGES.HISTORY_TITLE}\n\n`;
         
         history.forEach((entry, index) => {
             const date = new Date(entry.timestamp).toLocaleDateString();
@@ -377,10 +382,9 @@ ${randomWord.emoji} *${randomWord.word}* — ${randomWord.definition}
 
         this.wordService.recordRequest(from.id);
 
-        const text = msg.text.toLowerCase();
-        const difficulty = text.includes('easy') ? 'easy' : 
-                          text.includes('hard') ? 'hard' : 
-                          text.includes('medium') ? 'medium' : null;
+        const validDifficulties = new Set(['easy', 'medium', 'hard']);
+        const commandParts = msg.text.trim().toLowerCase().split(/\s+/);
+        const difficulty = commandParts[1] || null;
 
         if (!difficulty) {
             const helpMessage = `🎯 *Difficulty Settings*
@@ -395,6 +399,13 @@ To change difficulty, use:
 💡 *Note:* Difficulty affects word selection preferences.`;
 
             await this.bot.sendMessage(chat.id, helpMessage, { 
+                parse_mode: 'Markdown' 
+            });
+            return;
+        }
+
+        if (!validDifficulties.has(difficulty)) {
+            await this.bot.sendMessage(chat.id, Constants.MESSAGES.INVALID_DIFFICULTY, { 
                 parse_mode: 'Markdown' 
             });
             return;

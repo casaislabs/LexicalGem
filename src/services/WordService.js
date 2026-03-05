@@ -8,6 +8,7 @@ class WordService {
     constructor() {
         this.words = [];
         this.usedWords = new Set();
+        this.validDifficulties = new Set(['easy', 'medium', 'hard']);
         this.stats = {
             totalRequests: 0,
             uniqueUsers: new Set(),
@@ -65,7 +66,7 @@ class WordService {
                 });
             }
 
-            this.words = validation.validWords;
+            this.words = this.assignWordDifficulties(validation.validWords);
             
             if (this.words.length === 0) {
                 Logger.warn('No valid words found, using fallback words');
@@ -90,7 +91,7 @@ class WordService {
      * Load fallback words when JSON file is unavailable
      */
     loadFallbackWords() {
-        this.words = [...Constants.FALLBACK_WORDS];
+        this.words = this.assignWordDifficulties([...Constants.FALLBACK_WORDS]);
         Logger.warn(Constants.LOGS.USING_FALLBACK);
     }
 
@@ -98,7 +99,7 @@ class WordService {
      * Get a random word without repetition
      * @returns {Object|null} - Random word object or null
      */
-    getRandomWord() {
+    getRandomWord(preferredDifficulty = 'medium') {
         if (!this.isInitialized || this.words.length === 0) {
             Logger.warn('Attempted to get word before initialization or no words available');
             return null;
@@ -117,19 +118,80 @@ class WordService {
             return null;
         }
 
-        // Select random word from available ones
-        const randomIndex = Math.floor(Math.random() * availableWords.length);
-        const selectedWord = availableWords[randomIndex];
+        const normalizedDifficulty = this.normalizeDifficulty(preferredDifficulty);
+        const difficultyMatchedWords = availableWords.filter(
+            word => word.difficulty === normalizedDifficulty
+        );
+        const selectionPool = difficultyMatchedWords.length > 0 ? difficultyMatchedWords : availableWords;
+        const randomIndex = Math.floor(Math.random() * selectionPool.length);
+        const selectedWord = selectionPool[randomIndex];
         
         // Mark as used
         this.usedWords.add(selectedWord.word);
 
         Logger.debug('Word selected', { 
             word: selectedWord.word,
+            preferredDifficulty: normalizedDifficulty,
+            selectedDifficulty: selectedWord.difficulty,
+            usedFallbackPool: difficultyMatchedWords.length === 0,
             remaining: this.words.length - this.usedWords.size 
         });
 
         return selectedWord;
+    }
+
+    normalizeDifficulty(difficulty) {
+        if (typeof difficulty !== 'string') {
+            return 'medium';
+        }
+
+        const normalized = difficulty.toLowerCase();
+        return this.validDifficulties.has(normalized) ? normalized : 'medium';
+    }
+
+    assignWordDifficulties(words) {
+        if (!Array.isArray(words) || words.length === 0) {
+            return [];
+        }
+
+        const thresholds = this.getComplexityThresholds(words);
+
+        return words.map(word => {
+            const complexity = this.calculateWordComplexity(word);
+            let difficulty = 'hard';
+
+            if (complexity <= thresholds.easyMax) {
+                difficulty = 'easy';
+            } else if (complexity <= thresholds.mediumMax) {
+                difficulty = 'medium';
+            }
+
+            return {
+                ...word,
+                difficulty
+            };
+        });
+    }
+
+    getComplexityThresholds(words) {
+        const complexities = words
+            .map(word => this.calculateWordComplexity(word))
+            .sort((a, b) => a - b);
+
+        const lastIndex = complexities.length - 1;
+        const easyIndex = Math.floor(lastIndex / 3);
+        const mediumIndex = Math.floor((lastIndex * 2) / 3);
+
+        return {
+            easyMax: complexities[easyIndex],
+            mediumMax: complexities[mediumIndex]
+        };
+    }
+
+    calculateWordComplexity(word) {
+        const wordLength = typeof word.word === 'string' ? word.word.trim().length : 0;
+        const definitionLength = typeof word.definition === 'string' ? word.definition.trim().length : 0;
+        return (wordLength * 8) + definitionLength;
     }
 
     /**

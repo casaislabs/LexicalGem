@@ -171,6 +171,17 @@ class UserService {
      * @returns {string} - Difficulty level
      */
     calculateWordDifficulty(word) {
+        if (!word || typeof word !== 'object') {
+            return 'medium';
+        }
+
+        if (typeof word.difficulty === 'string') {
+            const normalizedDifficulty = word.difficulty.toLowerCase();
+            if (['easy', 'medium', 'hard'].includes(normalizedDifficulty)) {
+                return normalizedDifficulty;
+            }
+        }
+
         const length = word.word.length;
         const definitionLength = word.definition.length;
 
