@@ -1,0 +1,16 @@
+services:
+  bot:
+    container_name: lexicalgem-bot
+    image: lexicalgem:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    init: true
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+    read_only: true
+    tmpfs:
+      - /tmp

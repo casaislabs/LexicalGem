@@ -79,7 +79,7 @@ Start chatting with the bot to discover rare and elegant words!
 3. **Configure your bot token**
    ```bash
    # Copy the example environment file
-   cp env.example .env
+   cp .env.example .env
    
    # Edit the .env file and add your bot token
    # Replace 'your_bot_token_here' with your actual bot token
@@ -102,13 +102,42 @@ Start chatting with the bot to discover rare and elegant words!
    npm start
    ```
 
+### Docker
+
+1. **Create your environment file**
+   ```bash
+   cp .env.example .env
+   ```
+
+2. **Set your bot token in `.env`**
+   ```env
+   BOT_TOKEN_CODE=your_actual_bot_token_here
+   NODE_ENV=production
+   ```
+
+3. **Build and start with Docker Compose**
+   ```bash
+   npm run docker:build
+   npm run docker:up
+   ```
+
+4. **Inspect logs**
+   ```bash
+   npm run docker:logs
+   ```
+
+5. **Stop the container**
+   ```bash
+   npm run docker:down
+   ```
+
 ### Configuration
 
 The bot uses environment variables for secure configuration:
 
 1. **Copy the example file:**
    ```bash
-   cp env.example .env
+   cp .env.example .env
    ```
 
 2. **Edit `.env` and add your bot token:**
@@ -213,7 +242,12 @@ The bot is designed to be easily extensible. You can:
 ## 📝 Available Scripts
 
 - `npm start` - Start the bot
+- `npm run dev` - Start the bot in development mode
 - `npm test` - Run tests (placeholder)
+- `npm run docker:build` - Build the production Docker image
+- `npm run docker:up` - Start the production container in background
+- `npm run docker:down` - Stop and remove the production container
+- `npm run docker:logs` - Stream container logs
 
 ## 🔒 Security Features
 
